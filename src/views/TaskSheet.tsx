@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'preact/hooks'
-import { addDays, dayOfWeek, formatLong, formatShort, parseKey, WD_SHORT } from '../domain/dates'
+﻿import { useEffect, useMemo, useState } from 'preact/hooks'
+import { addDays, dateKey, dayOfWeek, formatLong, formatShort, parseKey, WD_SHORT } from '../domain/dates'
 import { describeRule } from '../domain/recurrence'
 import type { DateKey, Freq, Row, RRule, Task } from '../domain/types'
 import * as A from '../store/actions'
@@ -8,7 +8,7 @@ import { Chip, Field, Sheet } from '../ui/primitives'
 
 type Mode = { kind: 'create'; date: DateKey } | { kind: 'edit'; row: Row; date: DateKey }
 
-const WD_ORDER = [1, 2, 3, 4, 5, 6, 0] // lunedì → domenica
+const WD_ORDER = [1, 2, 3, 4, 5, 6, 0] // lunedÃ¬ â†’ domenica
 
 export function TaskSheet(props: { mode: Mode | null; onClose: () => void }) {
   const s = useStore()
@@ -18,7 +18,7 @@ export function TaskSheet(props: { mode: Mode | null; onClose: () => void }) {
 
   const [title, setTitle] = useState('')
   const [note, setNote] = useState('')
-  const [date, setDate] = useState<DateKey>(day)
+  const [date, setDate] = useState<DateKey>(day || dateKey(new Date()))
   const [time, setTime] = useState('')
   const [alarm, setAlarm] = useState(false)
   const [mustDo, setMustDo] = useState(false)
@@ -121,7 +121,7 @@ export function TaskSheet(props: { mode: Mode | null; onClose: () => void }) {
           <Chip active={date === day} onClick={() => setDate(day)}>Oggi</Chip>
           <Chip active={date === addDays(day, 1)} onClick={() => setDate(addDays(day, 1))}>Domani</Chip>
           <label class={'chip' + (date !== day && date !== addDays(day, 1) ? ' is-active' : '')}>
-            {date !== day && date !== addDays(day, 1) ? formatShort(date) : 'Data…'}
+            {date !== day && date !== addDays(day, 1) ? formatShort(date) : 'Dataâ€¦'}
             <input class="chip-native" type="date" value={date} onChange={(e) => setDate((e.target as HTMLInputElement).value)} />
           </label>
         </div>
@@ -129,13 +129,13 @@ export function TaskSheet(props: { mode: Mode | null; onClose: () => void }) {
 
       <div class="chips">
         <label class={'chip' + (time ? ' is-active' : '')}>
-          {time || 'Ora…'}
+          {time || 'Oraâ€¦'}
           <input class="chip-native" type="time" value={time} onChange={(e) => setTime((e.target as HTMLInputElement).value)} />
         </label>
         {time && (
           <>
             <Chip active={alarm} onClick={() => setAlarm(!alarm)}>Sveglia</Chip>
-            <Chip onClick={() => { setTime(''); setAlarm(false) }}>✕ ora</Chip>
+            <Chip onClick={() => { setTime(''); setAlarm(false) }}>âœ• ora</Chip>
           </>
         )}
         <Chip active={mustDo} onClick={() => setMustDo(!mustDo)}>Must do</Chip>
@@ -182,7 +182,7 @@ export function TaskSheet(props: { mode: Mode | null; onClose: () => void }) {
             </Field>
           )}
           {freq === 'monthly' && (
-            <Field label="Giorno del mese" hint="Il 29, 30 o 31 cade sull'ultimo giorno nei mesi più corti.">
+            <Field label="Giorno del mese" hint="Il 29, 30 o 31 cade sull'ultimo giorno nei mesi piÃ¹ corti.">
               <input type="number" min={1} max={31} value={monthDay} onInput={(e) => setMonthDay(Number((e.target as HTMLInputElement).value))} />
             </Field>
           )}
@@ -250,7 +250,7 @@ export function LogSheet(props: { target: { taskId: string; date: DateKey; title
   const t = props.target
   return (
     <Sheet open onClose={props.onClose} title={t.title}>
-      <p class="hint">{formatLong(t.date)} · com'è andata?</p>
+      <p class="hint">{formatLong(t.date)} Â· com'Ã¨ andata?</p>
       <textarea
         rows={4}
         autoFocus
@@ -272,3 +272,4 @@ export function LogSheet(props: { target: { taskId: string; date: DateKey; title
     </Sheet>
   )
 }
+
